@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nderitu Auto Spares</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f3f5f7;color:#17232c}
+header{background:#101820;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.logo{font-size:21px;font-weight:bold}
+.logo span{color:#ff902c}
+nav{display:flex;gap:16px}
+nav a{color:white;text-decoration:none;font-size:14px}
+button{cursor:pointer}
+.cart-btn,.main-btn{background:#ff902c;color:#111;border:0;padding:12px 18px;border-radius:7px;font-weight:bold}
+.hero{background:linear-gradient(120deg,#101820,#30495a);color:white;text-align:center;padding:65px 6%}
+.hero h1{font-size:clamp(30px,5vw,46px);margin-bottom:15px}
+.hero h1 span{color:#ff902c}
+.hero p{line-height:1.7;color:#d6e0e7;max-width:650px;margin:0 auto 22px}
+.models{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:25px 10px}
+.model{background:white;border:1px solid #ddd;padding:12px 20px;border-radius:25px;font-weight:bold}
+.model.active,.model:hover{background:#101820;color:white}
+.section{padding:35px 5%}
+.section h2{font-size:27px;margin-bottom:8px}
+.sub{color:#687782;margin-bottom:20px}
+.search{width:100%;max-width:550px;padding:14px;border:1px solid #ccd5dc;border-radius:8px;font-size:15px;margin:12px 0 25px}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.product{background:white;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px #15233012}
+.product-image{height:155px;background:#e6ebef;display:flex;align-items:center;justify-content:center}
+.product-image img{width:100%;height:100%;object-fit:cover}
+.placeholder{font-size:55px}
+.product-info{padding:16px}
+.tag{display:inline-block;background:#edf2f5;padding:5px 9px;border-radius:5px;font-size:11px;margin-bottom:10px}
+.product h3{font-size:17px;margin-bottom:8px}
+.part{font-size:12px;color:#74818a;margin-bottom:8px}
+.description{font-size:13px;color:#63717a;line-height:1.5}
+.price{font-size:20px;font-weight:bold;margin:13px 0}
+.stock{font-size:12px;color:#27804d;margin-bottom:12px}
+.add-btn{width:100%;padding:11px;background:#101820;color:white;border:0;border-radius:6px;font-weight:bold}
+.status{text-align:center;padding:30px;color:#596873;grid-column:1/-1}
+.about,.contact{text-align:center;padding:40px 6%;background:white;line-height:1.8}
+.about p{max-width:700px;margin:12px auto;color:#63717a}
+.contact{background:#e8edf1}
+footer{background:#101820;color:#cbd4da;text-align:center;padding:23px;font-size:13px}
+.cart-panel{position:fixed;inset:0;background:#0008;z-index:10;display:none;justify-content:flex-end}
+.cart-panel.open{display:flex}
+.cart-content{background:white;width:100%;max-width:420px;height:100%;padding:22px;overflow:auto}
+.cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.close{border:0;background:none;font-size:28px}
+.cart-item{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #eee}
+.total{font-size:21px;font-weight:bold;margin:20px 0}
+.checkout{width:100%;padding:14px;background:#16864a;color:white;border:0;border-radius:7px;font-weight:bold;margin-bottom:10px}
+.empty{text-align:center;color:#77848d;padding:30px 0}
+@media(max-width:600px){header{padding:15px 4%}nav{order:3;width:100%;justify-content:center}.hero{padding:48px 6%}.section{padding:28px 4%}}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">NDERITU <span>AUTO SPARES</span></div>
+<nav>
+<a href="#home">Home</a>
+<a href="#products">Spare Parts</a>
+<a href="#about">About</a>
+<a href="#contact">Contact</a>
+</nav>
+<button class="cart-btn" onclick="openCart()">Cart (<span id="cartCount">0</span>)</button>
+</header>
+
+<section class="hero" id="home">
+<h1>TRUCK SPARE PARTS <span>YOU CAN TRUST</span></h1>
+<p>Quality spare parts for Mercedes Actros MP4, Atego and DAF trucks. Browse our products and order conveniently from anywhere in Kenya.</p>
+<a href="#products"><button class="main-btn">Explore Spare Parts</button></a>
+</section>
+
+<div class="models">
+<button class="model active" onclick="setFilter('ALL',this)">All Parts</button>
+<button class="model" onclick="setFilter('MP4',this)">Mercedes MP4</button>
+<button class="model" onclick="setFilter('Atego',this)">Atego</button>
+<button class="model" onclick="setFilter('DAF',this)">DAF</button>
+</div>
+
+<section class="section" id="products">
+<h2>Our Spare Parts</h2>
+<p class="sub">Browse available truck parts.</p>
+<input class="search" id="search" type="search" placeholder="Search product or part number..." oninput="renderProducts()">
+<div class="products" id="productsGrid">
+<div class="status">Loading products...</div>
+</div>
+</section>
+
+<section class="about" id="about">
+<h2>About Nderitu Auto Spares</h2>
+<p>We specialize in truck spare parts for Mercedes Actros MP4, Atego and DAF. Our goal is to make finding and ordering truck parts simple and convenient.</p>
+<strong>Quality parts. Reliable service. Convenient ordering.</strong>
+</section>
+
+<section class="contact" id="contact">
+<h2>Need help finding a spare part?</h2>
+<p>Contact us and tell us your truck model and the part you need.</p>
+</section>
+
+<footer>© 2026 Nderitu Auto Spares. All rights reserved.</footer>
+
+<div class="cart-panel" id="cartPanel">
+<div class="cart-content">
+<div class="cart-head">
+<h2>Your Cart</h2>
+<button class="close" onclick="closeCart()">×</button>
+</div>
+<div id="cartItems"></div>
+<div class="total" id="cartTotal">Total: KSh 0</div>
+<button class="checkout" onclick="checkout()">Order via WhatsApp</button>
+</div>
+</div>
+
+async function loadProducts() {
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error);
+    }
+
+    products = await response.json();
+    renderProducts();
+
+  } catch (error) {
+    console.error("Product loading error:", error);
+    grid.innerHTML = `
+      <div class="status">
+        Could not load products. Please try again later.
+      </div>
+    `;
+  }
+}
+
+/* FILTER PRODUCTS */
+function setFilter(model, button) {
+  currentFilter = model;
+
+  document.querySelectorAll(".model").forEach(item => {
+    item.classList.remove("active");
+  });
+
+  button.classList.add("active");
+  renderProducts();
+}
+
+/* DISPLAY PRODUCTS */
+function renderProducts() {
+  const search = document.getElementById("search").value
+    .toLowerCase()
+    .trim();
+
+  const filtered = products.filter(product => {
+    const model = String(product.truck_model || "").toLowerCase();
+
+    const matchesModel =
+      currentFilter === "ALL" ||
+      model.includes(currentFilter.toLowerCase());
+
+    const matchesSearch =
+      String(product.name || "").toLowerCase().includes(search) ||
+      String(product.batch_number || "").toLowerCase().includes(search) ||
+      model.includes(search);
+
+    return matchesModel && matchesSearch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="status">
+        No spare parts found. Please check again later.
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(product => {
+    const id = escapeHTML(product.id);
+    const image = product.image_url
+      ? `<img src="${escapeHTML(product.image_url)}"
+              alt="${escapeHTML(product.name)}"
+              onerror="this.parentElement.innerHTML='<div class=placeholder>🔧</div>'">`
+      : `<div class="placeholder">🔧</div>`;
+
+    return `
+      <article class="product">
+        <div class="product-image">${image}</div>
+
+        <div class="product-info">
+          <span class="tag">
+            ${escapeHTML(product.truck_model || "Truck")}
+          </span>
+
+          <h3>${escapeHTML(product.name)}</h3>
+
+          <p class="part">
+            Part No: ${escapeHTML(product.batch_number || "N/A")}
+          </p>
+
+          <p class="description">
+            ${escapeHTML(product.description || "Quality truck spare part.")}
+          </p>
+
+          <div class="price">
+            KSh ${money(product.price_kes)}
+          </div>
+
+          <p class="stock">
+            ${Number(product.stock) > 0
+              ? `${Number(product.stock)} in stock`
+              : "Out of stock"}
+          </p>
+
+          <button class="add-btn"
+            ${Number(product.stock) <= 0 ? "disabled" : ""}
+            onclick="addToCart('${id}')">
+            Add to Cart
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+/* SHOPPING CART */
+function addToCart(id) {
+  const product = products.find(item => String(item.id) === String(id));
+
+  if (!product) return;
+
+  const existing = cart.find(item => String(item.id) === String(id));
+
+  if (existing) {
+    if (existing.quantity >= Number(product.stock)) {
+      alert("Sorry, available stock limit reached.");
+      return;
+    }
+    existing.quantity++;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: Number(product.price_kes),
+      stock: Number(product.stock),
+      quantity: 1
+    });
+  }
+
+  updateCart();
+  alert("Product added to cart!");
+}
+
+function updateCart() {
+  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  document.getElementById("cartCount").textContent = count;
+
+  const container = document.getElementById("cartItems");
+
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="empty">Your cart is empty.</div>`;
+  } else {
+    container.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div>
+          <strong>${escapeHTML(item.name)}</strong>
+          <p>KSh ${money(item.price)} × ${item.quantity}</p>
+        </div>
+        <div>
+          <button onclick="changeQuantity('${escapeHTML(item.id)}',-1)">−</button>
+          <button onclick="changeQuantity('${escapeHTML(item.id)}',1)">+</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity, 0
+  );
+
+  document.getElementById("cartTotal").textContent =
+    "Total: KSh " + money(total);
+}
+
+function changeQuantity(id, change) {
+  const item = cart.find(product => String(product.id) === String(id));
+
+  if (!item) return;
+
+  item.quantity += change;
+
+  if (item.quantity <= 0) {
+    cart = cart.filter(product => String(product.id) !== String(id));
+  } else if (item.quantity > item.stock) {
+    item.quantity = item.stock;
+    alert("Available stock limit reached.");
+  }
+
+  updateCart();
+}
+
+function openCart() {
+  document.getElementById("cartPanel").classList.add("open");
+}
+
+function closeCart() {
+  document.getElementById("cartPanel").classList.remove("open");
+}
+
+/* WHATSAPP CHECKOUT */
+function checkout() {
+  if (cart.length === 0) {
+    alert("Your cart is empty.");
+    return;
+  }
+
+  if (!/^2547\d{8}$/.test(WHATSAPP_NUMBER)) {
+    alert("The shop WhatsApp number has not been configured yet.");
+    return;
+  }
+
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity, 0
+  );
+
+  let message = "Hello Nderitu Auto Spares. I would like to order:\n\n";
+
+  cart.forEach(item => {
+    message +=
+      `${item.name} - ${item.quantity} × KSh ${money(item.price)}\n`;
+  });
+
+  message += `\nTOTAL: KSh ${money(total)}`;
+  message += "\n\nPlease confirm availability and delivery details.";
+
+  const url =
+    "https://wa.me/" + WHATSAPP_NUMBER +
+    "?0116172776=" + encodeURIComponent(message);
+
+  window.open(url, "_blank");
+}
+
+/* START WEBSITE */
+updateCart();
+loadProducts();
+</script>
+
+</body>
+</html>
